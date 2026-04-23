@@ -412,7 +412,7 @@ async function addWidget(type, savedW, savedH) {
 async function renderWidgetData(type, cid, el, wid) {
   try {
     const timeRange = (wid && widgetState[wid]) ? widgetState[wid].timeRange : '30d';
-    const r = await auth_get(`/admin/stats/kpi?range=${timeRange}`);
+    const r = await auth_get(`/admin/stats/kpi?time_range=${timeRange}`);
     const d = r.data;
     if (type === 'sessions') {
       el.querySelector('.sessions-number').innerText = d.sessions.toLocaleString();

@@ -426,7 +426,7 @@ def update_admin(
 
 @app.get("/api/admin/stats/kpi")
 def get_kpi_data(
-    range: Optional[str] = "30d",
+    time_range: Optional[str] = "30d",
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.check_role(["super_admin", "admin"]))
 ):
@@ -442,7 +442,7 @@ def get_kpi_data(
         "7d":  (timedelta(days=7),    7,  lambda i: (now - timedelta(days=6-i)).strftime("%a")),
         "30d": (timedelta(days=180),  6,  lambda i: (now - timedelta(days=(5-i)*30)).strftime("%b")),
     }
-    delta, slots, label_fn = RANGE_MAP.get(range, RANGE_MAP["30d"])
+    delta, slots, label_fn = RANGE_MAP.get(time_range, RANGE_MAP["30d"])
     since   = now - delta
     labels  = [label_fn(i) for i in range(slots)]
 
@@ -482,7 +482,7 @@ def get_kpi_data(
     }
 
     if is_empty:
-        bar_data, line_data = MOCK.get(range, MOCK["30d"])
+        bar_data, line_data = MOCK.get(time_range, MOCK["30d"])
         status_labels = ["Processed", "Pending", "Failed"]
         status_data   = [65, 25, 10]
     else:
