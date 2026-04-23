@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chart Builder — Admin Dashboard Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --surface2: #ffffff;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      --accent: #3b82f6;
+      --accent2: #ef4444;
+      --accent3: #10b981;
+      --accent4: #f59e0b;
+      --accent5: #8b5cf6;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ── Top Bar ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 24px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--gradient);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .logo span { color: var(--accent); }
+
+    header .subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover {
+      background: var(--surface);
+      border-color: var(--text-light);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    .btn.primary {
+      background: var(--gradient);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn.primary:hover {
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+    }
+    .btn.danger {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: var(--accent2);
+    }
+    .btn.danger:hover {
+      background: rgba(239, 68, 68, 0.05);
+      border-color: var(--accent2);
+    }
+
+    /* ── Layout ── */
+    .app-body {
+      display: flex;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 300px;
+      min-height: calc(100vh - 73px);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Dropdown selector */
+    .dropdown-wrap {
+      position: relative;
+    }
+    .dropdown-wrap select {
+      width: 100%;
+      padding: 12px 40px 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .dropdown-wrap select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .dropdown-arrow {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-light);
+      font-size: 0.75rem;
+    }
+
+    /* Graph cards in sidebar */
+    .graph-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .graph-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      cursor: grab;
+      transition: all 0.2s ease;
+      user-select: none;
+      box-shadow: var(--shadow);
+    }
+    .graph-card:hover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.05);
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+    .graph-card:active { cursor: grabbing; transform: scale(0.97); }
+
+    .graph-card.dragging {
+      opacity: 0.4;
+    }
+
+    .graph-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .graph-card-info { flex: 1; min-width: 0; }
+    .graph-card-info strong {
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: block;
+      color: var(--text);
+    }
+    .graph-card-info span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .drag-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.05);
+      border: 1px dashed var(--border);
+    }
+
+    /* ── Canvas ── */
+    .canvas {
+      flex: 1;
+      position: relative;
+      overflow: auto;
+      padding: 32px;
+      min-height: calc(100vh - 73px);
+      background: linear-gradient(45deg, #f8fafc 25%, transparent 25%),
+                  linear-gradient(-45deg, #f8fafc 25%, transparent 25%),
+                  linear-gradient(45deg, transparent 75%, #f8fafc 75%),
+                  linear-gradient(-45deg, transparent 75%, #f8fafc 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+    .empty-state.hidden { opacity: 0; }
+    .empty-icon { font-size: 52px; opacity: 0.25; }
+    .empty-state h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .empty-state p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      opacity: 0.8;
+      text-align: center;
+      max-width: 300px;
+    }
+
+    .drop-overlay {
+      position: absolute;
+      inset: 0;
+      border: 2px dashed var(--accent);
+      border-radius: 16px;
+      background: rgba(59, 130, 246, 0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.125rem;
+      color: var(--accent);
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 50;
+      letter-spacing: 0.5px;
+    }
+    .drop-overlay.active { opacity: 1; }
+
+    /* Dropped chart widget */
+    .chart-widget {
+      position: absolute;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.2s;
+      resize: both;
+      min-width: 280px;
+      min-height: 240px;
+    }
+    .chart-widget:hover {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(59, 130, 246, 0.1);
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      cursor: move;
+      flex-shrink: 0;
+    }
+    .widget-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      flex: 1;
+      color: var(--text);
+    }
+    .widget-badge {
+      font-size: 0.6875rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .widget-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .widget-btn {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-light);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s;
+    }
+    .widget-btn:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+    .widget-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent2); }
+    .widget-export:hover { background: rgba(16, 185, 129, 0.1); color: var(--accent3); }
+
+    .widget-body {
+      flex: 1;
+      padding: 16px;
+      position: relative;
+      min-height: 0;
+    }
+    .widget-body canvas { width: 100% !important; height: 100% !important; }
+
+    /* Resize handle hint */
+    .chart-widget::after {
+      content: '⤡';
+      position: absolute;
+      bottom: 4px;
+      right: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+
+    /* Animations */
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .chart-widget { animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    .drag-hint i { animation: pulse 2s infinite; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; position: fixed; left: -100%; transition: left 0.3s; z-index: 200; }
+      .sidebar.open { left: 0; }
+      .canvas { padding: 16px; }
+      .header-actions .btn span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    Graph<span>Drop</span>
+  </div>
+  <span class="subtitle">Drag · Drop · Visualize</span>
+  <div class="header-actions">
+    <button class="btn success" id="exportAll">
+      <i class="fas fa-download"></i>
+      <span>Export All</span>
+    </button>
+    <button class="btn danger" id="clearAll">
+      <i class="fas fa-trash"></i>
+      <span>Clear All</span>
+    </button>
+    <button class="btn primary" id="addRandom">
+      <i class="fas fa-plus"></i>
+      <span>Add Chart</span>
+    </button>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-section-title">
+        <i class="fas fa-chart-line"></i>
+        Select Chart Type
+      </div>
+      <div class="dropdown-wrap">
+        <select id="graphSelect">
+          <option value="">— Choose a graph —</option>
+          <option value="bar">📊 Bar Chart</option>
+          <option value="line">📈 Line Chart</option>
+          <option value="pie">🥧 Pie Chart</option>
+          <option value="doughnut">🍩 Doughnut Chart</option>
+          <option value="radar">🕸️ Radar Chart</option>
+          <option value="polarArea">🎯 Polar Area</option>
+          <option value="scatter">✦ Scatter Plot</option>
+          <option value="bubble">🫧 Bubble Chart</option>
+        </select>
+        <span class="dropdown-arrow">▼</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-section-title">
+        <i class="fas fa-hand-paper"></i>
+        Drag to Canvas
+      </div>
+      <div class="graph-list" id="graphList">
+        <!-- Cards injected by JS -->
+      </div>
+    </div>
+
+    <div class="drag-hint">
+      <i class="fas fa-arrow-down"></i>
+      Drag a card onto the canvas or click <strong>&nbsp;+ Add Chart</strong>
+    </div>
+  </aside>
+
+  <!-- ── Canvas ── -->
+  <main class="canvas" id="canvas">
+    <div class="drop-overlay" id="dropOverlay">📌 Release to drop chart</div>
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📉</div>
+      <h2>No charts yet</h2>
+      <p>Select a chart type and drag it here, or click + Add Chart</p>
+    </div>
+  </main>
+
+</div>
+
+<script>
+// ── Graph definitions ──
+const GRAPHS = {
+  bar: {
+    label: 'Bar Chart',
+    emoji: '📊',
+    color: '#6c63ff',
+    bg: 'rgba(108,99,255,0.15)',
+    desc: 'Compare categories',
+    config: () => ({
+      type: 'bar',
+      data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets: [{
+          label: 'Revenue',
+          data: randArr(6, 20, 100),
+          backgroundColor: palette(6, '#6c63ff'),
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: chartOpts({ title: 'Monthly Revenue' })
+    })
+  },
+  line: {
+    label: 'Line Chart',
+    emoji: '📈',
+    color: '#43e97b',
+    bg: 'rgba(67,233,123,0.15)',
+    desc: 'Trends over time',
+    config: () => ({
+      type: 'line',
+      data: {
+        labels: ['Q1','Q2','Q3','Q4','Q5','Q6'],
+        datasets: [{
+          label: 'Growth',
+          data: randArr(6, 10, 90),
+          borderColor: '#43e97b',
+          backgroundColor: 'rgba(67,233,123,0.1)',
+          fill: true,
+          tension: 0.45,
+          pointBackgroundColor: '#43e97b',
+          pointRadius: 5,
+        }]
+      },
+      options: chartOpts({ title: 'Growth Trend' })
+    })
+  },
+  pie: {
+    label: 'Pie Chart',
+    emoji: '🥧',
+    color: '#f7971e',
+    bg: 'rgba(247,151,30,0.15)',
+    desc: 'Part-to-whole',
+    config: () => ({
+      type: 'pie',
+      data: {
+        labels: ['Design','Dev','Marketing','Sales','Support'],
+        datasets: [{
+          data: randArr(5, 10, 40),
+          backgroundColor: ['#6c63ff','#43e97b','#f7971e','#ff6584','#38bdf8'],
+          borderWidth: 2,
+          borderColor: '#13162b',
+        }]
+      },
+      options: chartOpts({ title: 'Budget Split', legend: true })
+    })
+  },
+  doughnut: {
+    label: 'Doughnut',
+    emoji: '🍩',
+    color: '#ff6584',
+    bg: 'rgba(255,101,132,0.15)',
+    desc: 'Ring-style split',
+    config: () => ({
+      type: 'doughnut',
+      data: {
+        labels: ['Mobile','Desktop','Tablet','Other'],
+        datasets: [{
+          data: randArr(4, 15, 45),
+          backgroundColor: ['#ff6584','#6c63ff','#43e97b','#f7971e'],
+          borderWidth: 2,
+          borderColor: '#13162b',
+        }]
+      },
+      options: chartOpts({ title: 'Device Share', legend: true })
+    })
+  },
+  radar: {
+    label: 'Radar Chart',
+    emoji: '🕸️',
+    color: '#38bdf8',
+    bg: 'rgba(56,189,248,0.15)',
+    desc: 'Multi-axis comparison',
+    config: () => ({
+      type: 'radar',
+      data: {
+        labels: ['Speed','Power','Accuracy','Stamina','Agility','Vision'],
+        datasets: [{
+          label: 'Player A',
+          data: randArr(6, 40, 99),
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56,189,248,0.15)',
+          pointBackgroundColor: '#38bdf8',
+        },{
+          label: 'Player B',
+          data: randArr(6, 40, 99),
+          borderColor: '#ff6584',
+          backgroundColor: 'rgba(255,101,132,0.1)',
+          pointBackgroundColor: '#ff6584',
+        }]
+      },
+      options: chartOpts({ title: 'Player Stats', legend: true })
+    })
+  },
+  polarArea: {
+    label: 'Polar Area',
+    emoji: '🎯',
+    color: '#a855f7',
+    bg: 'rgba(168,85,247,0.15)',
+    desc: 'Magnitude by angle',
+    config: () => ({
+      type: 'polarArea',
+      data: {
+        labels: ['Alpha','Beta','Gamma','Delta','Epsilon'],
+        datasets: [{
+          data: randArr(5, 20, 80),
+          backgroundColor: ['rgba(108,99,255,0.7)','rgba(67,233,123,0.7)','rgba(247,151,30,0.7)','rgba(255,101,132,0.7)','rgba(56,189,248,0.7)'],
+          borderWidth: 1,
+          borderColor: '#13162b',
+        }]
+      },
+      options: chartOpts({ title: 'Polar Analysis', legend: true })
+    })
+  },
+  scatter: {
+    label: 'Scatter Plot',
+    emoji: '✦',
+    color: '#fbbf24',
+    bg: 'rgba(251,191,36,0.15)',
+    desc: 'Correlation view',
+    config: () => ({
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Dataset',
+          data: Array.from({length: 18}, () => ({ x: rnd(0,100), y: rnd(0,100) })),
+          backgroundColor: 'rgba(251,191,36,0.7)',
+          pointRadius: 6,
+        }]
+      },
+      options: chartOpts({ title: 'Scatter Analysis' })
+    })
+  },
+  bubble: {
+    label: 'Bubble Chart',
+    emoji: '🫧',
+    color: '#06b6d4',
+    bg: 'rgba(6,182,212,0.15)',
+    desc: '3-variable data',
+    config: () => ({
+      type: 'bubble',
+      data: {
+        datasets: [{
+          label: 'Bubbles',
+          data: Array.from({length: 10}, () => ({ x: rnd(5,95), y: rnd(5,95), r: rnd(5,22) })),
+          backgroundColor: palette(10, '#06b6d4', 0.5),
+        }]
+      },
+      options: chartOpts({ title: 'Bubble Analysis' })
+    })
+  }
+};
+
+// ── Helpers ──
+function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function randArr(n, a, b) { return Array.from({length: n}, () => rnd(a, b)); }
+function palette(n, hex, alpha = 0.75) {
+  return Array.from({length: n}, (_, i) => {
+    const h = (parseInt(hex.slice(1), 16) >> 16) & 0xff;
+    const hue = (parseInt(hex.slice(1,3),16) * 1.4 + i * 30) % 360;
+    return `hsla(${hue},72%,62%,${alpha})`;
+  });
+}
+
+function chartOpts({ title, legend = false } = {}) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: legend,
+        labels: { color: '#e8eaf6', font: { family: 'Inter', size: 11 }, boxWidth: 12, padding: 14 }
+      },
+      title: {
+        display: true,
+        text: title,
+        color: '#e8eaf6',
+        font: { family: 'Inter', size: 13, weight: '600' },
+        padding: { bottom: 10 }
+      },
+      tooltip: {
+        backgroundColor: '#1a1f38',
+        titleColor: '#e8eaf6',
+        bodyColor: '#7b7fa8',
+        borderColor: 'rgba(255,255,255,0.08)',
+        borderWidth: 1,
+        cornerRadius: 10,
+        padding: 10,
+      }
+    },
+    scales: title !== 'Bubble Analysis' && title !== 'Scatter Analysis' ? undefined : {
+      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7b7fa8' } },
+      y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7b7fa8' } }
+    }
+  };
+}
+
+// Add scales to line/bar
+['bar','line','scatter'].forEach(t => {
+  const orig = GRAPHS[t]?.config;
+  if (!orig) return;
+  GRAPHS[t].config = () => {
+    const cfg = orig();
+    cfg.options.scales = {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7b7fa8', font: { family: 'Inter', size: 11 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7b7fa8', font: { family: 'Inter', size: 11 } } }
+    };
+    return cfg;
+  };
+});
+
+// ── Populate sidebar cards ──
+const graphList = document.getElementById('graphList');
+const graphSelect = document.getElementById('graphSelect');
+
+function buildCards(filter = '') {
+  graphList.innerHTML = '';
+  Object.entries(GRAPHS).forEach(([key, g]) => {
+    if (filter && filter !== key) return;
+    const card = document.createElement('div');
+    card.className = 'graph-card';
+    card.draggable = true;
+    card.dataset.type = key;
+    card.innerHTML = `
+      <div class="graph-icon" style="background:${g.bg};">${g.emoji}</div>
+      <div class="graph-card-info">
+        <strong>${g.label}</strong>
+        <span>${g.desc}</span>
+      </div>
+      <span style="color:${g.color};font-size:1rem;">⋮⋮</span>
+    `;
+    card.addEventListener('dragstart', onDragStart);
+    card.addEventListener('click', () => dropChart(key));
+    graphList.appendChild(card);
+  });
+}
+buildCards();
+
+graphSelect.addEventListener('change', () => {
+  buildCards(graphSelect.value);
+});
+
+// ── Drag & Drop ──
+const canvas = document.getElementById('canvas');
+const dropOverlay = document.getElementById('dropOverlay');
+const emptyState = document.getElementById('emptyState');
+
+let dragType = null;
+
+function onDragStart(e) {
+  dragType = e.currentTarget.dataset.type;
+  e.currentTarget.classList.add('dragging');
+  setTimeout(() => e.currentTarget.classList.remove('dragging'), 0);
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+canvas.addEventListener('dragover', e => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  dropOverlay.classList.add('active');
+});
+
+canvas.addEventListener('dragleave', e => {
+  if (!canvas.contains(e.relatedTarget)) dropOverlay.classList.remove('active');
+});
+
+canvas.addEventListener('drop', e => {
+  e.preventDefault();
+  dropOverlay.classList.remove('active');
+  if (!dragType) return;
+  const rect = canvas.getBoundingClientRect();
+  const scrollX = canvas.scrollLeft;
+  const scrollY = canvas.scrollTop;
+  const x = e.clientX - rect.left + scrollX - 160;
+  const y = e.clientY - rect.top + scrollY - 100;
+  dropChart(dragType, Math.max(0, x), Math.max(0, y));
+  dragType = null;
+});
+
+// ── Create widget ──
+let widgetCount = 0;
+
+function dropChart(type, x, y) {
+  const g = GRAPHS[type];
+  if (!g) return;
+
+  emptyState.classList.add('hidden');
+  widgetCount++;
+
+  const defaultX = x ?? (40 + (widgetCount % 3) * 320);
+  const defaultY = y ?? (40 + Math.floor((widgetCount-1) / 3) * 280);
+
+  const widget = document.createElement('div');
+  widget.className = 'chart-widget';
+  widget.style.cssText = `
+    left:${defaultX}px; top:${defaultY}px;
+    width:360px; height:280px;
+  `;
+
+  widget.innerHTML = `
+    <div class="widget-header" style="border-top: 3px solid ${g.color};">
+      <span style="font-size:1.1rem">${g.emoji}</span>
+      <span class="widget-title">${g.label}</span>
+      <span class="widget-badge" style="background:${g.bg};color:${g.color};">${type}</span>
+      <div class="widget-actions">
+        <button class="widget-btn widget-export" title="Export Chart">
+          <i class="fas fa-download"></i>
+        </button>
+        <button class="widget-close widget-btn" title="Remove">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="widget-body">
+      <canvas id="chart-${widgetCount}"></canvas>
+    </div>
+  `;
+
+  canvas.appendChild(widget);
+
+  // Render Chart.js
+  const ctx = document.getElementById(`chart-${widgetCount}`).getContext('2d');
+  new Chart(ctx, g.config());
+
+  // Close button
+  widget.querySelector('.widget-close').addEventListener('click', () => {
+    widget.style.animation = 'none';
+    widget.style.transition = 'opacity 0.2s, transform 0.2s';
+    widget.style.opacity = '0';
+    widget.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+      widget.remove();
+      if (!document.querySelector('.chart-widget')) emptyState.classList.remove('hidden');
+    }, 200);
+  });
+
+  // Export button
+  widget.querySelector('.widget-export').addEventListener('click', () => {
+    const canvas = document.getElementById(`chart-${widgetCount}`);
+    const link = document.createElement('a');
+    link.download = `${g.label.toLowerCase().replace(' ', '-')}-chart.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+
+  // Drag-move widget
+  makeDraggable(widget, widget.querySelector('.widget-header'));
+}
+
+function makeDraggable(el, handle) {
+  let startX, startY, origX, origY;
+
+  handle.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    startX = e.clientX;
+    startY = e.clientY;
+    const rect = el.getBoundingClientRect();
+    const cRect = canvas.getBoundingClientRect();
+    origX = rect.left - cRect.left + canvas.scrollLeft;
+    origY = rect.top - cRect.top + canvas.scrollTop;
+    el.style.transition = 'none';
+    el.style.zIndex = 999;
+
+    function onMove(e) {
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      el.style.left = Math.max(0, origX + dx) + 'px';
+      el.style.top = Math.max(0, origY + dy) + 'px';
+    }
+    function onUp() {
+      el.style.zIndex = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    e.preventDefault();
+  });
+}
+
+// ── Header buttons ──
+document.getElementById('addRandom').addEventListener('click', () => {
+  const types = Object.keys(GRAPHS);
+  const sel = graphSelect.value || types[Math.floor(Math.random() * types.length)];
+  dropChart(sel);
+});
+
+document.getElementById('exportAll').addEventListener('click', () => {
+  const widgets = document.querySelectorAll('.chart-widget');
+  if (widgets.length === 0) {
+    alert('No charts to export!');
+    return;
+  }
+
+  // Create a zip-like export by downloading each chart
+  widgets.forEach((widget, index) => {
+    const title = widget.querySelector('.widget-title').textContent;
+    const canvas = widget.querySelector('canvas');
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = `${title.toLowerCase().replace(' ', '-')}-chart-${index + 1}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  });
+});
+
+document.getElementById('clearAll').addEventListener('click', () => {
+  document.querySelectorAll('.chart-widget').forEach(w => w.remove());
+  emptyState.classList.remove('hidden');
+  widgetCount = 0;
+});
+</script>
+</body>
+</html>

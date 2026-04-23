@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFI Agent | Super Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="login-page" class="login-page">
+    <div class="login-card">
+        <div class="login-brand">
+            <span>RFI</span><strong>Agent</strong>
+        </div>
+        <p class="login-intro">Secure admin access for Super Admin and Admin accounts. Enter your credentials to continue.</p>
+        <form id="login-form" class="login-fields">
+            <label class="input-label" for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="admin@example.com" autocomplete="username">
+            <label class="input-label" for="login-pass">Password</label>
+            <input type="password" id="login-pass" placeholder="Enter your password" autocomplete="current-password">
+            <button id="login-btn" type="submit" class="btn-primary w-full">Sign In</button>
+        </form>
+        <p class="login-note">Super Admin: super@rfiagent.com | Admin: admin@rfiagent.com</p>
+    </div>
+</div>
+
+<div id="app" class="app-shell">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside id="sidebar">
+        <div class="logo">RFI<span>Agent</span></div>
+
+        <!-- SUPER ADMIN Panel -->
+        <div id="superadmin-panel" style="display:none;">
+            <div class="user-card">
+                <div class="user-avatar-lg" id="sa-avatar-letter">S</div>
+                <div>
+                    <div id="sa-role" class="user-role-badge" style="background:#6c63ff;">SUPER ADMIN</div>
+                    <div id="sa-email" class="user-email-text"></div>
+                </div>
+            </div>
+
+            <p class="section-label">Super Admin Navigation</p>
+            <nav class="nav-section">
+                <button class="nav-btn active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i><span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-view="users">
+                    <i class="fas fa-users"></i><span>All Users</span>
+                </button>
+                <button class="nav-btn" data-view="audit">
+                    <i class="fas fa-shield-alt"></i><span>System Logs</span>
+                </button>
+                <button class="nav-btn" data-view="admins">
+                    <i class="fas fa-user-shield"></i><span>Manage Admins</span>
+                </button>
+            </nav>
+
+            <div id="sa-widget-store-section">
+                <p class="section-label">Widget Store <span class="hint">drag to canvas</span></p>
+                <div class="graph-list">
+                    <div class="graph-card" draggable="true" data-type="bar">
+                        <div class="graph-icon" style="background:rgba(108,99,255,0.2)">📊</div>
+                        <div><strong>Revenue</strong><span>Bar chart</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="line">
+                        <div class="graph-icon" style="background:rgba(67,233,123,0.2)">📈</div>
+                        <div><strong>Growth</strong><span>Line chart</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="pie">
+                        <div class="graph-icon" style="background:rgba(247,151,30,0.2)">🥧</div>
+                        <div><strong>Market Share</strong><span>Pie chart</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="sessions">
+                        <div class="graph-icon" style="background:rgba(255,101,132,0.2)">⚡</div>
+                        <div><strong>Sessions</strong><span>Live count</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="doughnut">
+                        <div class="graph-icon" style="background:rgba(56,189,248,0.2)">🍩</div>
+                        <div><strong>Device Split</strong><span>Doughnut</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="sa-save-layout" class="btn-primary w-full">
+                    <i class="fas fa-save"></i> Save Layout
+                </button>
+                <button id="sa-logout-btn" class="btn-ghost w-full">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- ADMIN Panel -->
+        <div id="admin-panel" style="display:none;">
+            <div class="user-card">
+                <div class="user-avatar-lg" style="background:#14b8a6;" id="admin-avatar-letter">A</div>
+                <div>
+                    <div id="profile-name-display" class="user-primary-text"></div>
+                    <div id="profile-email-display" class="user-email-text"></div>
+                </div>
+            </div>
+
+            <p class="section-label">Admin Navigation</p>
+            <nav class="nav-section">
+                <button class="nav-btn active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i><span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-view="users">
+                    <i class="fas fa-users"></i><span>Users</span>
+                </button>
+            </nav>
+
+            <div id="admin-widget-store-section">
+                <p class="section-label">Widget Store <span class="hint">drag to canvas</span></p>
+                <div class="graph-list">
+                    <div class="graph-card" draggable="true" data-type="bar">
+                        <div class="graph-icon" style="background:rgba(20,184,166,0.2)">📊</div>
+                        <div><strong>Revenue</strong><span>Bar chart</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="line">
+                        <div class="graph-icon" style="background:rgba(20,184,166,0.2)">📈</div>
+                        <div><strong>Growth</strong><span>Line chart</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="pie">
+                        <div class="graph-icon" style="background:rgba(20,184,166,0.2)">🥧</div>
+                        <div><strong>Market Share</strong><span>Pie chart</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="sessions">
+                        <div class="graph-icon" style="background:rgba(20,184,166,0.2)">⚡</div>
+                        <div><strong>Sessions</strong><span>Live count</span></div>
+                    </div>
+                    <div class="graph-card" draggable="true" data-type="doughnut">
+                        <div class="graph-icon" style="background:rgba(20,184,166,0.2)">🍩</div>
+                        <div><strong>Device Split</strong><span>Doughnut</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="admin-save-layout" class="btn-primary w-full">
+                    <i class="fas fa-save"></i> Save Layout
+                </button>
+                <button id="admin-logout-btn" class="btn-ghost w-full">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- USER Panel -->
+        <div id="user-panel" style="display:none;">
+            <div class="user-card">
+                <div class="user-avatar-lg" style="background:#f59e0b;" id="user-avatar-letter">U</div>
+                <div>
+                    <div id="u-profile-name" class="user-primary-text"></div>
+                    <div id="u-profile-email" class="user-email-text"></div>
+                </div>
+            </div>
+
+            <p class="section-label">Worker Navigation</p>
+            <nav class="nav-section">
+                <button class="nav-btn active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i><span>My Dashboard</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer" style="margin-top: auto;">
+                <button id="user-logout-btn" class="btn-ghost w-full">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <main id="main-canvas">
+
+        <!-- Header -->
+        <header id="top-header">
+            <div class="header-left">
+                <h2 id="view-title">Dashboard Overview</h2>
+                <p id="system-status">System integrity: <span style="color:#43e97b">Optimal</span></p>
+            </div>
+            <div class="header-right">
+                <!-- Super Admin buttons -->
+                <button id="sa-create-admin-btn" class="btn-primary" style="display:none;">
+                    <i class="fas fa-user-plus"></i> Create Admin
+                </button>
+            </div>
+        </header>
+
+        <!-- ADMINS Management View -->
+        <div id="admins-view" class="view-container" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Admin Account Management</h3>
+                    <button id="refresh-admins-btn" class="btn-ghost-sm"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Admin Identity</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admins-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══ DASHBOARD VIEW ═══ -->
+        <div id="dashboard-view" class="view-container">
+
+            <!-- KPI Stats Row (Draggable) -->
+            <div id="kpi-stats-row" class="kpi-row sortable-row">
+                <div class="kpi-card" id="kpi-users">
+                    <div class="kpi-icon" style="background:rgba(108,99,255,0.15);color:#6c63ff"><i class="fas fa-users"></i></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-val-users">—</div>
+                        <div class="kpi-label">Total Users</div>
+                    </div>
+                    <div class="kpi-trend up"><i class="fas fa-arrow-trend-up"></i></div>
+                </div>
+                <div class="kpi-card" id="kpi-active">
+                    <div class="kpi-icon" style="background:rgba(67,233,123,0.15);color:#43e97b"><i class="fas fa-circle-check"></i></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-val-active">—</div>
+                        <div class="kpi-label">Active Users</div>
+                    </div>
+                    <div class="kpi-trend up"><i class="fas fa-arrow-trend-up"></i></div>
+                </div>
+                <div class="kpi-card" id="kpi-sessions">
+                    <div class="kpi-icon" style="background:rgba(255,101,132,0.15);color:#ff6584"><i class="fas fa-bolt"></i></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-val-sessions">—</div>
+                        <div class="kpi-label">Live Sessions</div>
+                    </div>
+                    <div class="kpi-trend up"><i class="fas fa-arrow-trend-up"></i></div>
+                </div>
+                <div class="kpi-card" id="kpi-widgets">
+                    <div class="kpi-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8"><i class="fas fa-th-large"></i></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-val-widgets">—</div>
+                        <div class="kpi-label">Total Widgets</div>
+                    </div>
+                    <div class="kpi-trend down"><i class="fas fa-arrow-trend-down"></i></div>
+                </div>
+            </div>
+
+            <!-- Widget Canvas Grid -->
+            <div id="widget-canvas">
+                <div id="empty-state" class="empty-state">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Canvas is Empty</h3>
+                    <p>Drag widgets from the store on the left onto this canvas.</p>
+                    <div class="drop-hint-arrow">←</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ═══ USERS VIEW ═══ -->
+        <div id="users-view" class="view-container" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3>User Directory</h3>
+                    <span id="user-count-badge" class="count-badge"></span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Identity</th>
+                            <th>Access Role</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══ AUDIT VIEW ═══ -->
+        <div id="audit-view" class="view-container" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3>System Surveillance Logs</h3>
+                    <div class="log-controls">
+                        <select id="log-level-filter" class="select-sm" style="display:none;">
+                            <option value="">All Logs</option>
+                            <option value="INFO">Activities</option>
+                            <option value="ERROR">Technical Errors</option>
+                        </select>
+                        <button id="refresh-logs-btn" class="btn-ghost-sm"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Operator</th>
+                            <th>Event</th>
+                            <th>Detail</th>
+                            <th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Create Account Modal (Admin & User) -->
+<div id="create-admin-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus"></i> Register New Account</h3>
+            <button id="close-admin-modal" type="button" class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <p class="modal-sub">Create a new administrative or worker account in the system.</p>
+        
+        <form id="admin-create-form" style="display:contents;">
+            <div class="modal-control-group">
+                <label class="input-label">Account Role</label>
+                <select id="admin-role-select" class="input-pro">
+                    <option value="admin">Administrator (Observer/Manager)</option>
+                    <option value="user">User (Worker/Employee)</option>
+                </select>
+            </div>
+
+            <div class="modal-control-group">
+                <label class="input-label">Full Name</label>
+                <input type="text" id="admin-name" class="input-pro" placeholder="e.g. Farhan Ali">
+            </div>
+
+            <div class="modal-control-group">
+                <label class="input-label">Email Address</label>
+                <input type="email" id="admin-email" class="input-pro" placeholder="name@rfiagent.com">
+            </div>
+
+            <div class="modal-control-group">
+                <label class="input-label">Password</label>
+                <input type="password" id="admin-password" class="input-pro" placeholder="Set secure password">
+            </div>
+
+            <div class="modal-actions">
+                <button id="submit-admin" type="submit" class="btn-primary flex-1">Create Account</button>
+                <button id="close-modal" type="button" class="btn-ghost">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- User Activity Side Drawer -->
+<div id="drawer-overlay" class="drawer-overlay"></div>
+<div id="activity-drawer" class="side-drawer">
+    <div class="drawer-header">
+        <div class="drawer-close" id="close-drawer">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="drawer-identity-card">
+            <div class="user-avatar-lg" id="drawer-avatar">?</div>
+            <div>
+                <h3 id="drawer-name" style="margin:0;font-size:1.1rem;">User Name</h3>
+                <p id="drawer-email" style="margin:0;font-size:0.85rem;color:var(--text-muted);">user@example.com</p>
+            </div>
+        </div>
+        <div class="drawer-last-login">
+            <div class="drawer-last-login-title">Last System Check-in</div>
+            <div id="drawer-last-login-val" class="drawer-last-login-val">October 24, 2023 - 14:45</div>
+        </div>
+    </div>
+    <div class="drawer-body">
+        <p class="section-label" style="margin-bottom:16px;">Activity Surveillance Trail</p>
+        <div id="drawer-log-list">
+            <div class="log-loading"><i class="fas fa-spinner fa-spin"></i> Analyzing logs…</div>
+        </div>
+    </div>
+</div>
+
+<!-- Audit Log Detail Side Drawer -->
+<div id="log-drawer-overlay" class="drawer-overlay"></div>
+<div id="log-detail-drawer" class="side-drawer">
+    <div class="drawer-header">
+        <div class="drawer-close" id="close-log-drawer">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="drawer-identity-card">
+            <div class="user-avatar-lg" id="log-drawer-icon" style="background:rgba(79,70,229,0.1);color:var(--accent);">
+                <i class="fas fa-fingerprint"></i>
+            </div>
+            <div>
+                <h3 id="log-drawer-action" style="margin:0;font-size:1.1rem;">Action Name</h3>
+                <p id="log-drawer-time" style="margin:0;font-size:0.85rem;color:var(--text-muted);">Timestamp</p>
+            </div>
+        </div>
+    </div>
+    <div class="drawer-body">
+        <div class="log-detail-grid">
+            <div class="detail-item">
+                <label>Operator</label>
+                <div id="log-val-user">—</div>
+            </div>
+            <div class="detail-item">
+                <label>IP Address</label>
+                <div id="log-val-ip">—</div>
+            </div>
+        </div>
+        
+        <div id="log-error-report" style="display:none;margin-top:24px;">
+            <p class="section-label" style="color:#ec4899;"><i class="fas fa-bug"></i> Technical Failure Report</p>
+            <div class="error-details-box">
+                <div style="display:flex;gap:12px;margin-bottom:12px;">
+                    <div><label>Function</label><code id="log-val-func"></code></div>
+                    <div><label>Line</label><code id="log-val-line"></code></div>
+                </div>
+            </div>
+        </div>
+
+        <p class="section-label" style="margin-top:24px;">Event Payload Summary</p>
+        <div id="log-val-detail" class="log-detail-content">
+            Detail content...
+        </div>
+    </div>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
