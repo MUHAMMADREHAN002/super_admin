@@ -1,59 +1,64 @@
-# RFI Agent - Admin Dashboard
+# 🛡️ RFI Agent: Intelligent Command Centre
 
-A comprehensive admin panel built with FastAPI backend and vanilla JavaScript frontend.
+RFI Agent is a professional-grade **Administrative Surveillance & Management Dashboard**. Built with a high-performance FastAPI backend and a "Hyper-Visual" vanilla JavaScript frontend, it offers a secure and interactive environment for enterprise-level operations.
 
-## Setup
+---
 
-1. Install dependencies:
-   ```bash
-   pip install fastapi uvicorn sqlalchemy psycopg2-binary python-jose[cryptography] passlib[bcrypt] python-multipart
-   ```
+## 🚀 Deployment Guide
 
-2. Initialize the database:
-   ```bash
-   python init_db.py
-   ```
+### 1. Environment Setup
+Install the necessary high-performance dependencies:
+```bash
+pip install fastapi uvicorn sqlalchemy bcrypt python-jose[cryptography] python-multipart
+```
 
-3. Run the backend:
-   ```bash
-   uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
-   ```
+### 2. Strategic Database Initialization
+Reset and seed the surveillance database with default identity profiles:
+```bash
+python init_db.py
+```
 
-4. Open the frontend:
-   - Navigate to `http://localhost:8000` in your browser
-   - Or navigate to `frontend/index.html` directly
+### 3. Activating the Command Centre
+Launch the backend surveillance engine:
+```bash
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-## Login Credentials
+---
 
-- **Super Admin**: super@rfiagent.com / admin123
-- **Admin**: admin@rfiagent.com / admin123
-- **User (Jane)**: jane@example.com / password123
-- **User (Bob)**: bob@example.com / password123 (disabled)
+## 🔐 Intelligence Access (Default Credentials)
 
-## Features
+| Identity Type | Email | Password |
+| :--- | :--- | :--- |
+| **Super Admin** | `super@rfiagent.com` | `admin123` |
+| **Standard Admin** | `admin@rfiagent.com` | `admin123` |
+| **Standard User** | `jane@example.com` | `password123` |
 
-- **Role-based Access Control**: Super Admin, Admin, and User roles with permission enforcement
-- **Admin Dashboard**: KPI stats, user management, audit logs
-- **Audit Logging**: Complete audit trail for all user actions
-- **User Management**: View, edit, and manage user roles and status
-- **Drag-and-Drop Widgets**: Customizable KPI dashboard
-- **Real-time Updates**: Live data synchronization
-- **Responsive Design**: Mobile-friendly interface
-- **JWT Authentication**: Secure token-based authentication
+---
 
-## API Endpoints
+## ✨ Core Surveillance Features
 
-### Auth
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login (returns JWT token)
-- `GET /api/auth/me` - Get current user info
+*   **⚡ Hyper-Visual Dashboard:** Premium UI with glassmorphism and real-time data gradients.
+*   **🧩 Modular Widget System:** Fully draggable and customizable layout (Sortable.js integration).
+*   **📊 Interactive Intelligence:** Real-time chart morphing and multi-range time filtering.
+*   **🛡️ Role-Based Access (RBAC):** Strict permission enforcement for Super Admin, Admin, and User tiers.
+*   **👁️ Audit Surveillance:** Comprehensive logging of every identity action with IP tracking.
+*   **🔐 Military-Grade Hashing:** Direct Bcrypt implementation for ultimate password security.
 
-### Admin Only
-- `GET /api/admin/stats` - Dashboard statistics
-- `GET /api/admin/users` - List all users
-- `GET /api/admin/users/{user_id}/detail` - User details with activity
-- `PATCH /api/admin/users/{user_id}` - Update user role/status
-- `GET /api/admin/audit` - Audit logs viewer
+---
 
-### Super Admin Only
-- `POST /api/superadmin/create-admin` - Create new admin account
+## 🛠️ System Architecture
+
+### **Backend Engine**
+*   **Framework:** FastAPI (Asynchronous High-Performance)
+*   **Security:** JWT Token Exchange & Direct Bcrypt Hashing
+*   **Database:** SQLAlchemy ORM with SQLite Persistence
+
+### **Frontend Interface**
+*   **Design:** Modern CSS3 with dynamic variables and animation tokens
+*   **Logic:** Asynchronous Vanilla JavaScript (No heavy frameworks)
+*   **Charts:** Advanced Chart.js implementation for real-time analytics
+
+---
+**Status:** `MISSION READY / OPTIMAL`
+**Compiled By:** Antigravity AI Development Lead

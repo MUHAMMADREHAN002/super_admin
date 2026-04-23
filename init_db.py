@@ -76,12 +76,8 @@ def make_logs(db, user, log_entries):
         ))
 
 def init_db():
-    # Reset DB each time (dev only)
-    import os
-    if os.path.exists("sql_app.db"):
-        os.remove("sql_app.db")
-        print("Existing database removed for fresh seed.")
-
+    print("Resetting database tables...")
+    models.Base.metadata.drop_all(bind=engine)
     models.Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
